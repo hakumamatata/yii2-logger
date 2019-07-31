@@ -1,0 +1,24 @@
+{
+    "name": "hakumamatata/yii2-logger",
+    "description": "LOG紀錄(Table) Yii2套件",
+    "type": "library",
+    "keywords": [
+        "yii2",
+        "extension"
+    ],
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "edgar",
+            "email": "s985432@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "hakumamatata\\yii2logger\\": "src/"
+        }
+    }
+}
