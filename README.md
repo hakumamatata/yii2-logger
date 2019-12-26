@@ -1,6 +1,15 @@
-hakumamatata/yii2-logger
+hakumamatata/yii2logger
 =======================
 LOG紀錄(Table) Yii2套件
+
+
+版本更新
+----
+v1.0.5.1 :
+更新 - 將recordAct()、recordErrorLog()兩個方法做try...catch 包裝(有開關可以設定)，增加系統穩定性，並且有錯誤紀錄。
+
+v1.0.5 :
+更新 - 抓取 message欄位的$_GET、$_POST資訊時，增加過濾長度的功能 (避免像base64...等太長的字串)。
 
 安裝
 ----
@@ -9,13 +18,13 @@ LOG紀錄(Table) Yii2套件
 執行
 
 ```
-php composer.phar require hakumamatata/yii2-logger "*"
+php composer.phar require hakumamatata/yii2logger "*"
 ```
 
 或增加
 
 ```
-"hakumamatata/yii2-logger": "*"
+"hakumamatata/yii2logger": "*"
 ```
 
 到你的 `composer.json` 檔案中
@@ -32,7 +41,7 @@ Table: login_normal_log
 
 使用
 ----
-hakumamatata\yii2logger\NormalLog 為繼承 \yii\db\ActiveRecord 的物件，
+eztechtw\yii2logger\NormalLog 為繼承 \yii\db\ActiveRecord 的物件，
 
 建議使用Yii2配置組件的方式，於專案中的設定檔，
 如下所示(參數說明如註解):
@@ -50,11 +59,11 @@ hakumamatata\yii2logger\NormalLog 為繼承 \yii\db\ActiveRecord 的物件，
     ],
     # 自行設定想要的名稱
     'Logger' => [
-        'class' => 'hakumamatata\yii2logger\NormalLog',
+        'class' => 'eztechtw\yii2logger\NormalLog',
         # 下列兩個一定要設定 
         # 系統名稱
         'applicationSystemName' => 'poc', 
-        # DB設定指向到login的名稱
+        # yii2配置 DB login的名稱
         'dbAliasName' => 'dblogin',
         
         # 以下為選配
@@ -66,10 +75,22 @@ hakumamatata\yii2logger\NormalLog 為繼承 \yii\db\ActiveRecord 的物件，
         'logCategoryAction' => 'act_log',
         # 錯誤紀錄 分類名稱，預設值為'error_log'，建議各系統統一
         'logCategoryError' => 'error_log',
+        # 單一登入 yii2配置 單一登入的名稱
+        'simplesamlphpAliasName' => 'simplesamlphp'
+        # 登入系統紀錄 分類名稱，預設值為'login_log'，建議各系統統一
+        'logCategoryLogin' => 'login_log',
         # 是否紀錄 操作紀錄 的開關，預設值為true
         'isLog' => true,
         # 是否紀錄 操作紀錄 的開關，預設值為true
         'isErrorLog' => true,
+        // 是否使用session檢查 登入系統LOG 的開關，預設值為true
+        'isSessionCheck' => true,
+        // (過濾)可接收最長長度，預設值為1000
+        'filterLimitLength' => 1000,
+        // 最高過濾階層，預設值為3     
+        'filterMaxResortLevel' => 3, 
+        // 是否丟出異常或錯誤的開關，預設值為false
+        'isThrowException' => false,
     ],
     ...
 ]
@@ -126,7 +147,7 @@ try {
 ----
 非使用yii2配置方法時，可直接單獨使用
 ```
-use hakumamatata\yii2logger\NormalLog;
+use eztechtw\yii2logger\NormalLog;
 
 $log = new NormalLog([
     'applicationSystemName' => 'poc',
@@ -159,8 +180,13 @@ try {
 'controller' => 'Request Controller'
 'action' => 'Request Action'
 'created_at' => 'Created At'
+'updated_at' => 'Updated At'
 'category' => 'Log Category'
 'level' => 'Log Level'
 'prefix' => 'Log Prefix'
 'message' => 'Log Message'
 ```
+
+備註
+----
+呼叫recordAct()，組件會自動記錄 系統登入的LOG(會依賴單一登入資訊以及使用session檢查，同一登入只會記錄一次)。
